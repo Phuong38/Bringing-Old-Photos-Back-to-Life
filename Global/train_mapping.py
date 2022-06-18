@@ -89,11 +89,11 @@ for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
         # sum per device losses
         losses = [ torch.mean(x) if not isinstance(x, int) else x for x in losses ]
         loss_dict = dict(zip(model.loss_names, losses))
-        psnr_loss = psnr_loss.detach().cpu().numpy()
+        _psnr_loss = psnr_loss.cpu().data.numpy()
 
         # calculate final loss scalar
         loss_D = (loss_dict['D_fake'] + loss_dict['D_real']) * 0.5
-        loss_G = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat',0) + loss_dict.get('G_VGG',0) + loss_dict.get('G_Feat_L2', 0) +loss_dict.get('Smooth_L1', 0)+loss_dict.get('G_Feat_L2_Stage_1',0) + psnr_loss
+        loss_G = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat',0) + loss_dict.get('G_VGG',0) + loss_dict.get('G_Feat_L2', 0) +loss_dict.get('Smooth_L1', 0)+loss_dict.get('G_Feat_L2_Stage_1',0) + _psnr_loss
         #loss_G = loss_dict['G_Feat_L2'] 
 
         ############### Backward Pass ####################
