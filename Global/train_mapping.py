@@ -14,7 +14,7 @@ import torch
 import torchvision.utils as vutils
 from torch.autograd import Variable
 import datetime
-import random
+from losses import PSNRLoss
 
 
 
@@ -84,7 +84,7 @@ for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
 
         ############## Forward Pass ######################
         #print(pair)
-        losses, generated = model(Variable(data['label']), Variable(data['inst']), 
+        losses, generated, psnr_loss = model(Variable(data['label']), Variable(data['inst']),
             Variable(data['image']), Variable(data['feat']), infer=save_fake)
         
         # sum per device losses
@@ -93,7 +93,8 @@ for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
 
         # calculate final loss scalar
         loss_D = (loss_dict['D_fake'] + loss_dict['D_real']) * 0.5
-        loss_G = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat',0) + loss_dict.get('G_VGG',0) + loss_dict.get('G_Feat_L2', 0) +loss_dict.get('Smooth_L1', 0)+loss_dict.get('G_Feat_L2_Stage_1',0)
+        loss_G = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat',0) + loss_dict.get('G_VGG',0) + loss_dict.get('G_Feat_L2', 0) +loss_dict.get('Smooth_L1', 0)+loss_dict.get('G_Feat_L2_Stage_1',0) + psnr_loss
+        print('[PSNR loss] ', psnr_loss)
         #loss_G = loss_dict['G_Feat_L2'] 
 
         ############### Backward Pass ####################

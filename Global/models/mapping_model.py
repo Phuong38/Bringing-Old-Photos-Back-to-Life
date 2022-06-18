@@ -13,6 +13,7 @@ from .base_model import BaseModel
 from . import networks
 import math
 from .NonLocal_feature_mapping_model import *
+from Global.losses import  PSNRLoss
 
 
 class Mapping_Model(nn.Module):
@@ -58,6 +59,9 @@ class Mapping_Model(nn.Module):
 
 
 class Pix2PixHDModel_Mapping(BaseModel):
+    def __init__(self):
+        super().__init__()
+
     def name(self):
         return "Pix2PixHDModel_Mapping"
 
@@ -81,6 +85,9 @@ class Pix2PixHDModel_Mapping(BaseModel):
             torch.backends.cudnn.benchmark = True
         self.isTrain = opt.isTrain
         input_nc = opt.label_nc if opt.label_nc != 0 else opt.input_nc
+
+        if opt.use_psnr_loss:
+           self.psnr = PSNRLoss()
 
         ##### define networks
         # Generator network
@@ -212,6 +219,7 @@ class Pix2PixHDModel_Mapping(BaseModel):
 
             print("---------- Optimizers initialized -------------")
 
+
     def encode_input(self, label_map, inst_map=None, real_image=None, feat_map=None, infer=False):             
         if self.opt.label_nc == 0:
             input_label = label_map.data.cuda()
@@ -318,9 +326,11 @@ class Pix2PixHDModel_Mapping(BaseModel):
         if self.opt.Smooth_L1:
             smooth_l1_loss=self.criterionImage(fake_image,real_image)*self.opt.L1_weight
 
+        psnr_loss = 0
+        if self.opt.use_psnr_loss:
+            psnr_loss = self.psnr.forward(fake_image, real_image)
 
-        return [ self.loss_filter(loss_feat_l2, loss_G_GAN, loss_G_GAN_Feat, loss_G_VGG, loss_D_real, loss_D_fake,smooth_l1_loss,loss_feat_l2_stage_1), None if not infer else fake_image ]
-
+        return [self.loss_filter(loss_feat_l2, loss_G_GAN, loss_G_GAN_Feat, loss_G_VGG, loss_D_real, loss_D_fake,smooth_l1_loss,loss_feat_l2_stage_1), None if not infer else fake_image, psnr_loss]
 
     def inference(self, label, inst):
 
