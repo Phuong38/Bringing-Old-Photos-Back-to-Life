@@ -14,7 +14,6 @@ import torch
 import torchvision.utils as vutils
 from torch.autograd import Variable
 import datetime
-from losses import PSNRLoss
 
 
 
