@@ -89,7 +89,7 @@ for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
         # sum per device losses
         losses = [ torch.mean(x) if not isinstance(x, int) else x for x in losses ]
         loss_dict = dict(zip(model.loss_names, losses))
-        psnr_loss = psnr_loss.cpu().numpy()
+        psnr_loss = psnr_loss.cpu().detach().numpy()
 
         # calculate final loss scalar
         loss_D = (loss_dict['D_fake'] + loss_dict['D_real']) * 0.5
