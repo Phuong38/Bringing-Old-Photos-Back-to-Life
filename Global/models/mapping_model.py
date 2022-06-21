@@ -39,7 +39,7 @@ class PSNRLoss(nn.Module):
             pred, target = pred / 255., target / 255.
         assert len(pred.size()) == 4
 
-        return self.loss_weight * self.scale * torch.log(((pred - target) ** 2).mean(dim=(1, 2, 3)) + 1e-8).mean()
+        return - self.loss_weight * 1 / (self.scale * torch.log(((pred - target) ** 2).mean(dim=(1, 2, 3)) + 1e-8).mean())
 
 
 class Mapping_Model(nn.Module):
@@ -113,7 +113,7 @@ class Pix2PixHDModel_Mapping(BaseModel):
         input_nc = opt.label_nc if opt.label_nc != 0 else opt.input_nc
 
         if opt.use_psnr_loss:
-           self.psnr = PSNRLoss()
+           self.psnr = PSNRLoss(loss_weight=60)
 
         ##### define networks
         # Generator network
