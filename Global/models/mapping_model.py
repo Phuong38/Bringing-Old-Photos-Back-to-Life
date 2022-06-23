@@ -113,7 +113,7 @@ class Pix2PixHDModel_Mapping(BaseModel):
         input_nc = opt.label_nc if opt.label_nc != 0 else opt.input_nc
 
         if opt.use_psnr_loss:
-           self.psnr = PSNRLoss(loss_weight=60)
+           self.psnr = PSNRLoss(loss_weight=120.0)
 
         ##### define networks
         # Generator network
