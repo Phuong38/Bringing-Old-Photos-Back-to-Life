@@ -56,7 +56,8 @@ class TrainOptions(BaseOptions):
 
         self.parser.add_argument('--no_update_lr',action='store_true',help='use this means we do not update the LR while training')
         self.parser.add_argument('--use_psnr_loss', action='store_true',help='use this means use psnr metric as a loss function')
-
+        self.parser.add_argument('--psnr_loss_weight', type=float, default=1.0,
+                                 help='psnt loss weight')
 
         self.isTrain = True
 
